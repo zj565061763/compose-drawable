@@ -1,59 +1,48 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    `maven-publish`
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.mavenPublish)
 }
 
-val libGroupId = "com.sd.lib.android"
-val libArtifactId = "compose-drawable"
-val libVersion = "1.0.0"
-
 android {
-    namespace = "com.sd.lib.compose.drawable"
-    compileSdk = libs.versions.androidCompileSdk.get().toInt()
-    defaultConfig {
-        minSdk = 21
-    }
+  namespace = "com.sd.lib.compose.drawable"
+  compileSdk = libs.versions.androidCompileSdk.get().toInt()
+  defaultConfig {
+    minSdk = 21
+  }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+  }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += "-module-name=$libGroupId.$libArtifactId"
-    }
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
 
-    buildFeatures {
-        compose = true
-    }
+  buildFeatures {
+    compose = true
+  }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-    }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
+  composeOptions {
+    kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+  }
 }
 
 dependencies {
-    implementation(libs.androidx.compose.foundation)
+  val composeBom = platform(libs.androidx.compose.bom)
+  implementation(composeBom)
+  implementation(libs.androidx.compose.foundation)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            groupId = libGroupId
-            artifactId = libArtifactId
-            version = libVersion
-
-            afterEvaluate {
-                from(components["release"])
-            }
-        }
-    }
+mavenPublishing {
+  configure(
+    AndroidSingleVariantLibrary(
+      variant = "release",
+      sourcesJar = true,
+      publishJavadocJar = true,
+    )
+  )
 }

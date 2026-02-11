@@ -17,36 +17,36 @@ import com.sd.demo.compose.drawable.theme.AppTheme
 import com.sd.lib.compose.drawable.fDrawablePainter
 
 class SampleActivity : ComponentActivity() {
-   override fun onCreate(savedInstanceState: Bundle?) {
-      super.onCreate(savedInstanceState)
-      setContent {
-         AppTheme {
-            Content()
-         }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      AppTheme {
+        Content()
       }
-   }
+    }
+  }
 }
 
 @Composable
 private fun Content(
-   modifier: Modifier = Modifier,
+  modifier: Modifier = Modifier,
 ) {
-   Column(
-      modifier = modifier
-         .fillMaxSize()
-         .padding(10.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
-   ) {
-      Box(
-         modifier = Modifier
-            .size(300.dp)
-            .fDrawablePainter(R.drawable.bg)
-      )
-   }
+  Column(
+    modifier = modifier
+      .fillMaxSize()
+      .padding(10.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Box(
+      modifier = Modifier
+        .size(300.dp)
+        .fDrawablePainter(R.drawable.bg)
+    )
+  }
 }
 
 @Preview
 @Composable
 private fun PreviewContent() {
-   Content()
+  Content()
 }
