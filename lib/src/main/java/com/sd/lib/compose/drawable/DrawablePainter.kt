@@ -50,7 +50,7 @@ private val MAIN_HANDLER by lazy(LazyThreadSafetyMode.NONE) {
  * A [Painter] which draws an Android [Drawable] and supports [Animatable] drawables. Instances
  * should be remembered to be able to start and stop [Animatable] animations.
  *
- * Instances are usually retrieved from [rememberDrawablePainter].
+ * Instances are usually retrieved from [drawablePainter].
  */
 internal class DrawablePainter(
   public val drawable: Drawable,
@@ -149,7 +149,7 @@ internal class DrawablePainter(
  * @sample com.google.accompanist.sample.drawablepainter.BasicSample
  */
 @Composable
-internal fun rememberDrawablePainter(drawable: Drawable?): Painter = remember(drawable) {
+internal fun drawablePainter(drawable: Drawable?): Painter = remember(drawable) {
   when (drawable) {
     null -> EmptyPainter
     is ColorDrawable -> ColorPainter(Color(drawable.color))
