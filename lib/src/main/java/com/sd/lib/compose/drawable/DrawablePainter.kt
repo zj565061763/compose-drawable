@@ -16,7 +16,6 @@
 
 package com.sd.lib.compose.drawable
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -27,6 +26,7 @@ import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,22 +43,18 @@ import androidx.compose.ui.graphics.withSave
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
 
-private val MAIN_HANDLER by lazy(LazyThreadSafetyMode.NONE) {
-  Handler(Looper.getMainLooper())
-}
-
 /**
- * A [Painter] which draws an Android [Drawable] and supports [Animatable] drawables. Instances
- * should be remembered to be able to start and stop [Animatable] animations.
+ * A [Painter] which draws an Android [Drawable].
  *
  * Instances are usually retrieved from [drawablePainter].
  */
 internal class DrawablePainter(
-    public val drawable: Drawable,
+  val drawable: Drawable,
 ) : Painter(), RememberObserver {
-  private var drawInvalidateTick by mutableStateOf(0)
+  private var drawInvalidateTick by mutableIntStateOf(0)
   private var drawableIntrinsicSize by mutableStateOf(drawable.intrinsicSize)
 
+  private val mainHandler = Handler(Looper.getMainLooper())
   private val callback: Drawable.Callback by lazy {
     object : Drawable.Callback {
       override fun invalidateDrawable(d: Drawable) {
@@ -69,11 +65,11 @@ internal class DrawablePainter(
       }
 
       override fun scheduleDrawable(d: Drawable, what: Runnable, time: Long) {
-        MAIN_HANDLER.postAtTime(what, time)
+        mainHandler.postAtTime(what, time)
       }
 
       override fun unscheduleDrawable(d: Drawable, what: Runnable) {
-        MAIN_HANDLER.removeCallbacks(what)
+        mainHandler.removeCallbacks(what)
       }
     }
   }
@@ -88,13 +84,11 @@ internal class DrawablePainter(
   override fun onRemembered() {
     drawable.callback = callback
     drawable.setVisible(true, true)
-    if (drawable is Animatable) drawable.start()
   }
 
   override fun onAbandoned(): Unit = onForgotten()
 
   override fun onForgotten() {
-    if (drawable is Animatable) drawable.stop()
     drawable.setVisible(false, false)
     drawable.callback = null
   }
@@ -158,15 +152,13 @@ internal class DrawablePainter(
  *
  * This function tries to dispatch lifecycle events to [drawable] as much as possible from
  * within Compose.
- *
- * @sample com.google.accompanist.sample.drawablepainter.BasicSample
  */
 @Composable
 internal fun drawablePainter(drawable: Drawable?): Painter = remember(drawable) {
   when (drawable) {
     null -> EmptyPainter
     is ColorDrawable -> ColorPainter(Color(drawable.color))
-    // Since the DrawablePainter will be remembered and it implements RememberObserver, it
+    // Since the DrawablePainter will be remembered, and it implements RememberObserver, it
     // will receive the necessary events
     else -> DrawablePainter(drawable.mutate())
   }
