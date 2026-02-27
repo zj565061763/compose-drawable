@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.sd.demo.compose.drawable.theme.AppTheme
 import com.sd.lib.compose.drawable.rememberDrawablePainter
@@ -36,6 +37,7 @@ private fun Content(
       modifier = Modifier.fillMaxSize(),
       painter = rememberDrawablePainter(R.drawable.bg),
       contentDescription = null,
+      contentScale = ContentScale.FillBounds,
     )
   }
 }
